@@ -1,0 +1,2010 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>PLANET MERGE: MISI ANGKASA (FULL UPDATED EDITION)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+      -webkit-user-select: none;
+      touch-action: manipulation;
+    }
+
+    html, body {
+      width: 100vw;
+      height: 100dvh;
+      overflow: hidden;
+      font-family: 'Fredoka', 'Segoe UI', Tahoma, sans-serif;
+      background: #050714;
+      color: #ffffff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background-image: 
+        radial-gradient(circle at 15% 15%, rgba(124, 58, 237, 0.35) 0%, transparent 40%),
+        radial-gradient(circle at 85% 85%, rgba(14, 165, 233, 0.3) 0%, transparent 40%),
+        radial-gradient(circle at 50% 50%, rgba(15, 23, 42, 0.95) 0%, #050714 100%);
+    }
+
+    .starfield {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100dvh;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    #app-container {
+      position: relative;
+      width: 100vw;
+      height: 100dvh;
+      max-width: 500px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 10px;
+      z-index: 1;
+    }
+
+    .hud-header {
+      width: 100%;
+      background: rgba(15, 23, 42, 0.85);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      backdrop-filter: blur(12px);
+      border-radius: 16px;
+      padding: 6px 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+      flex-shrink: 0;
+    }
+
+    .user-badge {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .user-name {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: #38bdf8;
+    }
+
+    .user-class {
+      font-size: 0.75rem;
+      color: #94a3b8;
+    }
+
+    .stat-box {
+      text-align: center;
+    }
+
+    .stat-label {
+      font-size: 0.65rem;
+      color: #cbd5e1;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .stat-value {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #facc15;
+    }
+
+    .hud-controls {
+      display: flex;
+      gap: 5px;
+    }
+
+    .icon-btn {
+      background: rgba(255, 255, 255, 0.12);
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      color: #fff;
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 0.95rem;
+      transition: all 0.2s ease;
+    }
+
+    .icon-btn:hover {
+      background: rgba(255, 255, 255, 0.3);
+      transform: scale(1.08);
+    }
+
+    .icon-btn.active-off {
+      opacity: 0.4;
+      background: rgba(239, 68, 68, 0.35);
+    }
+
+    .game-layout {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      flex: 1;
+      min-height: 0;
+    }
+
+    .canvas-wrapper {
+      position: relative;
+      background: rgba(8, 12, 28, 0.9);
+      border: 3px solid rgba(56, 189, 248, 0.45);
+      border-radius: 18px;
+      box-shadow: 0 0 25px rgba(56, 189, 248, 0.25), inset 0 0 20px rgba(0, 0, 0, 0.85);
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    canvas {
+      display: block;
+      touch-action: none;
+    }
+
+    .side-panel {
+      display: flex;
+      flex-direction: row;
+      gap: 10px;
+      width: 100%;
+      justify-content: space-around;
+      flex-shrink: 0;
+    }
+
+    .panel-card {
+      background: rgba(15, 23, 42, 0.85);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      backdrop-filter: blur(12px);
+      border-radius: 14px;
+      padding: 6px 10px;
+      text-align: center;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .panel-title {
+      font-size: 0.68rem;
+      color: #94a3b8;
+      margin-bottom: 2px;
+      text-transform: uppercase;
+      font-weight: 600;
+    }
+
+    .next-canvas-container {
+      width: 50px;
+      height: 50px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .next-planet-name {
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: #38bdf8;
+    }
+
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100dvh;
+      background: rgba(2, 6, 23, 0.88);
+      backdrop-filter: blur(14px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+      padding: 16px;
+    }
+
+    .modal-overlay.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .modal-card {
+      background: rgba(15, 23, 42, 0.96);
+      border: 2px solid rgba(56, 189, 248, 0.35);
+      border-radius: 22px;
+      padding: 22px;
+      width: 100%;
+      max-width: 440px;
+      max-height: 85dvh;
+      overflow-y: auto;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8), 0 0 35px rgba(56, 189, 248, 0.25);
+      text-align: center;
+      animation: modalPop 0.3s ease-out;
+    }
+
+    @keyframes modalPop {
+      0% { transform: scale(0.88); opacity: 0; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+
+    .modal-title {
+      font-size: 1.6rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, #38bdf8, #818cf8, #f472b6);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 4px;
+    }
+
+    .modal-subtitle {
+      font-size: 0.88rem;
+      color: #94a3b8;
+      margin-bottom: 16px;
+    }
+
+    .form-group {
+      margin-bottom: 12px;
+      text-align: left;
+    }
+
+    .form-label {
+      display: block;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: #cbd5e1;
+      margin-bottom: 4px;
+      text-transform: uppercase;
+    }
+
+    .form-input {
+      width: 100%;
+      background: rgba(30, 41, 59, 0.85);
+      border: 1px solid rgba(255, 255, 255, 0.22);
+      border-radius: 12px;
+      padding: 10px 14px;
+      color: #ffffff;
+      font-family: inherit;
+      font-size: 0.95rem;
+      outline: none;
+      transition: border 0.2s;
+    }
+
+    .form-input:focus {
+      border-color: #38bdf8;
+      box-shadow: 0 0 12px rgba(56, 189, 248, 0.35);
+    }
+
+    .lang-selector {
+      display: flex;
+      gap: 8px;
+      margin-top: 4px;
+    }
+
+    .lang-btn {
+      flex: 1;
+      padding: 8px;
+      background: rgba(30, 41, 59, 0.85);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 10px;
+      color: #94a3b8;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-size: 0.85rem;
+    }
+
+    .lang-btn.active {
+      background: #0284c7;
+      border-color: #38bdf8;
+      color: #ffffff;
+      box-shadow: 0 0 14px rgba(56, 189, 248, 0.45);
+    }
+
+    .btn-primary {
+      width: 100%;
+      background: linear-gradient(135deg, #0284c7, #2563eb);
+      border: none;
+      border-radius: 12px;
+      padding: 12px;
+      color: #ffffff;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 6px 20px rgba(37, 99, 235, 0.45);
+      transition: all 0.2s ease;
+      margin-top: 8px;
+    }
+
+    .btn-secondary {
+      width: 100%;
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.22);
+      border-radius: 12px;
+      padding: 10px;
+      color: #ffffff;
+      font-size: 0.88rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      margin-top: 6px;
+    }
+
+    .error-msg {
+      color: #f87171;
+      font-size: 0.8rem;
+      margin-top: 4px;
+      text-align: left;
+      display: none;
+    }
+
+    .leaderboard-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 8px;
+      font-size: 0.85rem;
+    }
+
+    .leaderboard-table th {
+      background: rgba(30, 41, 59, 0.85);
+      padding: 8px;
+      color: #38bdf8;
+      font-weight: 700;
+      text-align: center;
+      border-bottom: 2px solid rgba(255, 255, 255, 0.12);
+    }
+
+    .leaderboard-table td {
+      padding: 8px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+      text-align: center;
+    }
+
+    .rank-1 { color: #facc15; font-weight: 700; }
+    .rank-2 { color: #e2e8f0; font-weight: 700; }
+    .rank-3 { color: #f97316; font-weight: 700; }
+
+    .encyclo-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+      gap: 10px;
+      max-height: 45dvh;
+      overflow-y: auto;
+      padding-right: 4px;
+      margin-top: 10px;
+    }
+
+    .encyclo-card {
+      background: rgba(30, 41, 59, 0.65);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 12px;
+      padding: 10px;
+      text-align: center;
+    }
+
+    .encyclo-card.locked {
+      opacity: 0.45;
+      filter: grayscale(0.85);
+    }
+
+    .encyclo-img {
+      width: 50px;
+      height: 50px;
+      margin: 0 auto 6px auto;
+    }
+
+    .encyclo-name {
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: #38bdf8;
+    }
+
+    .encyclo-fact {
+      font-size: 0.68rem;
+      color: #cbd5e1;
+      margin-top: 4px;
+      line-height: 1.25;
+    }
+
+    .slider-container {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 8px;
+    }
+
+    .slider-label {
+      font-size: 0.8rem;
+      color: #cbd5e1;
+      width: 90px;
+      text-align: left;
+    }
+
+    .slider-input {
+      flex: 1;
+      accent-color: #38bdf8;
+    }
+
+    .win-banner {
+      font-size: 1.8rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, #facc15, #f97316, #ef4444);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      animation: pulseWin 1s infinite alternate;
+      margin-bottom: 8px;
+    }
+
+    @keyframes pulseWin {
+      from { transform: scale(0.95); }
+      to { transform: scale(1.05); }
+    }
+
+    .unlock-card-bg {
+      background: rgba(30, 41, 59, 0.7);
+      border: 1px solid rgba(56, 189, 248, 0.3);
+      border-radius: 16px;
+      padding: 14px;
+      margin: 12px 0;
+    }
+
+    .unlock-canvas-box {
+      width: 110px;
+      height: 110px;
+      margin: 0 auto 10px auto;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+  </style>
+</head>
+<body>
+
+  <canvas class="starfield" id="starfieldCanvas"></canvas>
+
+  <div id="app-container">
+    <div class="hud-header">
+      <div class="user-badge">
+        <span class="user-name" id="hudName">Nama Murid</span>
+        <span class="user-class" id="hudClass">Kelas</span>
+      </div>
+      <div class="stat-box">
+        <div class="stat-label" id="lblScore">SKOR</div>
+        <div class="stat-value" id="hudScore">0</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-label" id="lblHigh">TERTINGGI</div>
+        <div class="stat-value" id="hudHighScore">0</div>
+      </div>
+      <div class="hud-controls">
+        <button class="icon-btn" id="btnSound" title="Sound Effects">🔊</button>
+        <button class="icon-btn" id="btnMusic" title="Music">🎵</button>
+        <button class="icon-btn" id="btnPause" title="Pause">⏸️</button>
+      </div>
+    </div>
+
+    <div class="game-layout">
+      <div class="canvas-wrapper">
+        <canvas id="gameCanvas"></canvas>
+      </div>
+
+      <div class="side-panel">
+        <div class="panel-card">
+          <div class="panel-title" id="lblNext">SETERUSNYA</div>
+          <div class="next-canvas-container">
+            <canvas id="nextCanvas" width="50" height="50"></canvas>
+          </div>
+          <div class="next-planet-name" id="nextPlanetName">Utarid</div>
+        </div>
+
+        <div class="panel-card">
+          <div class="panel-title" id="lblMerges">GABUNGAN</div>
+          <div class="stat-value" id="hudMerges" style="color: #38bdf8;">0</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL 1: BORANG PENGENALAN MURID -->
+  <div class="modal-overlay active" id="modalSetup">
+    <div class="modal-card">
+      <div class="modal-title">PLANET MERGE</div>
+      <div class="modal-subtitle">MISI ANGKASA SAINS TAHUN 3</div>
+      
+      <div class="form-group">
+        <label class="form-label" id="lblInputName">NAMA MURID</label>
+        <input type="text" class="form-input" id="inputStudentName" placeholder="Masukkan nama penuh anda" maxlength="30">
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" id="lblInputClass">KELAS</label>
+        <input type="text" class="form-input" id="inputStudentClass" placeholder="Cth: 3 Cemerlang" maxlength="20">
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" id="lblSelectLang">PILIH BAHASA / LANGUAGE</label>
+        <div class="lang-selector">
+          <button class="lang-btn active" id="btnLangMs" onclick="setLanguage('ms')">Bahasa Melayu</button>
+          <button class="lang-btn" id="btnLangEn" onclick="setLanguage('en')">English</button>
+        </div>
+      </div>
+
+      <div class="error-msg" id="setupError">Sila isi nama dan kelas terlebih dahulu!</div>
+
+      <button class="btn-primary" id="btnStartSetup" onclick="submitStudentSetup()">MULA BERMAIN 🚀</button>
+    </div>
+  </div>
+
+  <!-- MODAL 2: MENU UTAMA -->
+  <div class="modal-overlay" id="modalMenu">
+    <div class="modal-card">
+      <div class="modal-title">PLANET MERGE</div>
+      <div class="modal-subtitle" id="menuWelcomeMsg">Selamat Datang!</div>
+
+      <button class="btn-primary" id="btnPlay" onclick="startGameSession()">MAIN PERMAINAN 🎮</button>
+      <button class="btn-secondary" id="btnHowToPlay" onclick="openModal('modalHowTo')">CARA BERMAIN 📖</button>
+      <button class="btn-secondary" id="btnEncyclopedia" onclick="openEncyclopedia()">ENSIKLOPEDIA PLANET 🪐</button>
+      <button class="btn-secondary" id="btnLeaderboard" onclick="openLeaderboard()">LEADERBOARD 🏆</button>
+      <button class="btn-secondary" id="btnChangeStudent" onclick="changeStudentProfile()">TUKAR MURID 👤</button>
+
+      <div style="margin-top: 12px; border-top: 1px solid rgba(255,255,255,0.12); padding-top: 10px;">
+        <div class="slider-container">
+          <span class="slider-label" id="lblMusicVol">Muzik</span>
+          <input type="range" class="slider-input" id="sliderMusic" min="0" max="1" step="0.05" value="0.8" onchange="setMusicVolume(this.value)">
+        </div>
+        <div class="slider-container">
+          <span class="slider-label" id="lblSfxVol">Kesan Bunyi</span>
+          <input type="range" class="slider-input" id="sliderSfx" min="0" max="1" step="0.05" value="0.8" onchange="setSfxVolume(this.value)">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL 3: CARA BERMAIN -->
+  <div class="modal-overlay" id="modalHowTo">
+    <div class="modal-card">
+      <div class="modal-title" id="titleHowTo">CARA BERMAIN</div>
+      <div style="text-align: left; font-size: 0.85rem; color: #cbd5e1; line-height: 1.5; margin-bottom: 16px;">
+        <p id="descHowTo1">1. Gerakkan tetikus atau seret skrin untuk memilih kedudukan planet.</p>
+        <p id="descHowTo2">2. Klik atau lepaskan sentuhan untuk menjatuhkan planet ke dalam bekas.</p>
+        <p id="descHowTo3">3. Temukan dua planet yang SAMA untuk bergabung menjadi planet yang LEBIH BESAR!</p>
+        <p id="descHowTo4">4. <b>Sistem Nyahkunci:</b> Setiap kali di-unlock, anda berpeluang menjatuhkan planet baharu tersebut mengikut kadar seimbang!</p>
+        <p id="descHowTo5">5. Buka Pluto ais, planet pelangi rahsia & cipta <b>MATAHARI</b>!</p>
+      </div>
+      <button class="btn-primary" onclick="closeModal('modalHowTo')">PAHAM / GOT IT</button>
+    </div>
+  </div>
+
+  <!-- MODAL 4: ENSIKLOPEDIA PLANET -->
+  <div class="modal-overlay" id="modalEncyclo">
+    <div class="modal-card">
+      <div class="modal-title" id="titleEncyclo">ENSIKLOPEDIA PLANET</div>
+      <div class="modal-subtitle" id="noteEncyclo">Nota: Saiz planet kerdil selepas Musytari diselaraskan seakan saiz Neptun!</div>
+      
+      <div class="encyclo-grid" id="encycloGrid"></div>
+
+      <button class="btn-primary" style="margin-top: 12px;" onclick="closeModal('modalEncyclo')">TUTUP / CLOSE</button>
+    </div>
+  </div>
+
+  <!-- MODAL 5: LEADERBOARD -->
+  <div class="modal-overlay" id="modalLeaderboard">
+    <div class="modal-card">
+      <div class="modal-title" id="titleLeaderboard">LEADERBOARD ANGKASA</div>
+      
+      <div style="display: flex; gap: 8px; margin-bottom: 10px;">
+        <select class="form-input" id="filterClass" style="padding: 6px;" onchange="loadLeaderboardData()">
+          <option value="ALL">Semua Kelas / All Classes</option>
+        </select>
+        <button class="btn-secondary" style="width: auto; margin-top:0;" onclick="loadLeaderboardData()">🔄</button>
+      </div>
+
+      <div id="leaderboardStatus" style="font-size: 0.8rem; color: #94a3b8; margin-bottom: 6px;">Memuatkan data...</div>
+
+      <div style="max-height: 38dvh; overflow-y: auto;">
+        <table class="leaderboard-table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th id="thName">NAMA</th>
+              <th id="thClass">KELAS</th>
+              <th id="thScore">SKOR</th>
+              <th id="thPlanet">GABUNGAN</th>
+            </tr>
+          </thead>
+          <tbody id="leaderboardBody"></tbody>
+        </table>
+      </div>
+
+      <button class="btn-primary" style="margin-top: 12px;" onclick="closeModal('modalLeaderboard')">KEMBALI / BACK</button>
+    </div>
+  </div>
+
+  <!-- MODAL 6: PAUSE MENU -->
+  <div class="modal-overlay" id="modalPause">
+    <div class="modal-card">
+      <div class="modal-title" id="titlePause">PERMAINAN DIJEDA</div>
+      <button class="btn-primary" id="btnResume" onclick="resumeGame()">SAMBUNG / RESUME</button>
+      <button class="btn-secondary" id="btnRestartPause" onclick="confirmRestart()">MULA SEMULA / RESTART</button>
+      <button class="btn-secondary" id="btnMenuPause" onclick="returnToMenu()">MENU UTAMA</button>
+    </div>
+  </div>
+
+  <!-- MODAL 7: GAME OVER -->
+  <div class="modal-overlay" id="modalGameOver">
+    <div class="modal-card">
+      <div class="modal-title" style="color: #f87171;" id="titleGameOver">TAMAT PERMAINAN</div>
+      <div class="modal-subtitle" id="goMsg">Kawasan permainan telah penuh!</div>
+
+      <div style="background: rgba(30, 41, 59, 0.65); border-radius: 12px; padding: 10px; margin-bottom: 12px;">
+        <div style="font-size: 1.05rem; font-weight: 700; color: #facc15;" id="goScoreText">Skor Akhir: 0</div>
+        <div style="font-size: 0.8rem; color: #cbd5e1; margin-top: 2px;" id="goDetailsText">Gabungan: 0 | Masa: 0s</div>
+        <div style="font-size: 0.8rem; color: #38bdf8; margin-top: 2px;" id="goStatusText">Status Leaderboard: Menghantar...</div>
+      </div>
+
+      <button class="btn-primary" id="btnRetrySubmit" style="display:none; background: #ea580c; margin-bottom: 6px;" onclick="submitScoreToBackend()">CUBA HANTAR SEMULA 🔄</button>
+      <button class="btn-primary" onclick="startGameSession()">MAIN SEMULA 🚀</button>
+      <button class="btn-secondary" onclick="openLeaderboard()">LIHAT LEADERBOARD 🏆</button>
+      <button class="btn-secondary" onclick="returnToMenu()">MENU UTAMA</button>
+    </div>
+  </div>
+
+  <!-- MODAL 8: KEMENANGAN -->
+  <div class="modal-overlay" id="modalWin">
+    <div class="modal-card" style="border-color: #facc15;">
+      <div class="win-banner" id="winTitle">ANDA MENANG! ☀️</div>
+      <div class="modal-subtitle" id="winMsg">Tahniah! Anda berjaya menguji sains & mencipta MATAHARI!</div>
+
+      <div style="background: rgba(234, 179, 8, 0.15); border: 1px solid rgba(250, 204, 21, 0.4); border-radius: 14px; padding: 12px; margin-bottom: 12px;">
+        <div style="font-size: 1.1rem; font-weight: 700; color: #facc15;" id="winScoreText">Bonus +20000 Mata Matahari!</div>
+      </div>
+
+      <button class="btn-primary" style="background: linear-gradient(135deg, #eab308, #ca8a04);" onclick="closeModal('modalWin')">TERUSKAN PERMAINAN 🌟</button>
+      <button class="btn-secondary" onclick="closeModal('modalWin'); triggerGameOver();">SELESAIKAN MISI 🏆</button>
+    </div>
+  </div>
+
+  <!-- MODAL 9: UNLOCK PLANET (PEMBELAJARAN SAINS) -->
+  <div class="modal-overlay" id="modalUnlock">
+    <div class="modal-card">
+      <div class="modal-title" style="color: #facc15;">PLANET BAHARU! 🌟</div>
+      <div class="modal-subtitle">Tahniah! Anda telah membina planet baharu:</div>
+
+      <div class="unlock-card-bg">
+        <div class="unlock-canvas-box">
+          <canvas id="unlockCanvas" width="110" height="110"></canvas>
+        </div>
+        <div style="font-size: 1.2rem; font-weight: 700; color: #38bdf8;" id="unlockPlanetTitle">Utarid</div>
+        <div style="font-size: 0.78rem; color: #facc15; margin-top: 2px;" id="unlockPlanetKm">4,879 km</div>
+        <div style="font-size: 0.85rem; color: #e2e8f0; margin-top: 8px; line-height: 1.4;" id="unlockPlanetFact">Fakta planet...</div>
+      </div>
+
+      <button class="btn-primary" style="background: linear-gradient(135deg, #10b981, #059669);" onclick="resumeFromUnlock()">TERUSKAN 🚀</button>
+    </div>
+  </div>
+
+  <script>
+    const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyeoXiLxfrh0yJlSSAGl46EDHTrTr1IkWJp0qY4OBfzyIKvjJF93UEc1yDfStGDrOxy/exec";
+
+    const PLANET_DATA = [
+      { id: 0, nameMs: "Utarid", nameEn: "Mercury", realKm: "4,879 km", baseRadius: 18, score: 10, color: "#a1a1aa", factMs: "Planet paling dekat dengan Matahari dan paling kecil dalam planet utama.", factEn: "Closest planet to the Sun and the smallest main planet." },
+      { id: 1, nameMs: "Marikh", nameEn: "Mars", realKm: "6,792 km", baseRadius: 22, score: 20, color: "#ef4444", factMs: "Dikenali sebagai planet merah kerana permukaan tanahnya yang berkarat besi.", factEn: "Known as the red planet due to rusty soil." },
+      { id: 2, nameMs: "Zuhrah", nameEn: "Venus", realKm: "12,104 km", baseRadius: 28, score: 40, color: "#fde047", factMs: "Planet kedua dari Matahari. Mempunyai atmosfera paling panas!", factEn: "Second planet from Sun with super hot atmosphere." },
+      { id: 3, nameMs: "Bumi", nameEn: "Earth", realKm: "12,742 km", baseRadius: 34, score: 80, color: "#0284c7", factMs: "Satu-satunya planet tempat tinggal kita yang mempunyai air cecair dan kehidupan.", factEn: "Our home planet with liquid water and life." },
+      { id: 4, nameMs: "Neptun", nameEn: "Neptune", realKm: "49,244 km", baseRadius: 42, score: 160, color: "#1d4ed8", factMs: "Planet kelapan yang amat dingin, berwarna biru pekat dan berangin paling kencang.", factEn: "Eighth planet, extremely cold and windy." },
+      { id: 5, nameMs: "Uranus", nameEn: "Uranus", realKm: "50,724 km", baseRadius: 50, score: 320, color: "#06b6d4", factMs: "Planet gergasi ais yang unik kerana berputar secara mengiring di atas orbitnya.", factEn: "Seventh planet that rotates on its side." },
+      { id: 6, nameMs: "Zuhal", nameEn: "Saturn", realKm: "116,460 km", baseRadius: 58, score: 640, color: "#eab308", factMs: "Planet yang terkenal dengan sistem gelang/cincin ais paling jelas dan indah.", factEn: "Famous for its prominent and beautiful ring system." },
+      { id: 7, nameMs: "Musytari", nameEn: "Jupiter", realKm: "139,820 km", baseRadius: 66, score: 1280, color: "#f97316", factMs: "Planet terbesar dalam Sistem Suria dengan Bintik Merah Besar di permukaannya.", factEn: "Largest planet in the Solar System with Great Red Spot." },
+      { id: 8, nameMs: "Pluto 🧊", nameEn: "Pluto 🧊", realKm: "2,376 km", baseRadius: 24, score: 2000, color: "#38bdf8", isIce: true, factMs: "Planet kerdil kepingan ais & glasiar terbeku di Jalur Kuiper yang dikira planet ke-9!", factEn: "Icy dwarf planet in Kuiper belt made of frozen water & nitrogen!" },
+      { id: 9, nameMs: "Ceres (Rahsia 1) 🌈", nameEn: "Ceres 🌈", realKm: "940 km", baseRadius: 40, score: 3500, color: "#78716c", isSecret: true, factMs: "Planet kerdil berbatu di Jalur Asteroid dengan keajaiban pelangi galaksi!", factEn: "Dwarf planet in Asteroid belt with rainbow glow!" },
+      { id: 10, nameMs: "Planet X (Rahsia 2) 🌈", nameEn: "Planet X 🌈", realKm: "~40,000 km", baseRadius: 42, score: 6000, color: "#8b5cf6", isSecret: true, factMs: "Planet misteri di pinggir luar galaksi yang memancarkan aura pelangi neon!", factEn: "Hypothetical planet with rainbow neon glow!" },
+      { id: 11, nameMs: "Planet Kucing 🐱🌈", nameEn: "Cat Planet 🐱🌈", realKm: "~100,000 km", baseRadius: 45, score: 10000, color: "#f97316", isSecret: true, factMs: "Planet rahsia fantasi berbentuk kucing comel bersinar dengan warna pelangi!", factEn: "Secret cat planet with rainbow effect!" },
+      { id: 12, nameMs: "Matahari ☀️", nameEn: "Sun ☀️", realKm: "1,392,700 km", baseRadius: 75, score: 20000, color: "#fbbf24", factMs: "Pusat Sistem Suria yang memancarkan cahaya dan haba untuk seluruh kehidupan!", factEn: "Center of the Solar System providing light and heat!" }
+    ];
+
+    function getPlanetData(tier) {
+      if (tier < 0) return PLANET_DATA[0];
+      if (tier >= PLANET_DATA.length) return PLANET_DATA[PLANET_DATA.length - 1];
+      return PLANET_DATA[tier];
+    }
+
+    function adjustColor(hex, amt) {
+      let color = hex.replace("#", "");
+      if (color.length === 3) {
+        color = color.split("").map(c => c + c).join("");
+      }
+      let num = parseInt(color, 16);
+      let r = Math.min(255, Math.max(0, (num >> 16) + amt));
+      let g = Math.min(255, Math.max(0, ((num >> 8) & 0x00FF) + amt));
+      let b = Math.min(255, Math.max(0, (num & 0x0000FF) + amt));
+
+      const rHex = r.toString(16).padStart(2, '0');
+      const gHex = g.toString(16).padStart(2, '0');
+      const bHex = b.toString(16).padStart(2, '0');
+
+      return `#${rHex}${gHex}${bHex}`;
+    }
+
+    const TRANSLATIONS = {
+      ms: {
+        welcomeMsg: "Selamat bermain, {name} dari kelas {class}!",
+        score: "SKOR", high: "TERTINGGI", next: "SETERUSNYA", merges: "GABUNGAN",
+        startBtn: "MULA BERMAIN 🚀", playBtn: "MAIN PERMAINAN 🎮", howToBtn: "CARA BERMAIN 📖",
+        encycloBtn: "ENSIKLOPEDIA PLANET 🪐", leaderboardBtn: "LEADERBOARD 🏆", changeStudentBtn: "TUKAR MURID 👤",
+        musicVol: "Muzik", sfxVol: "Kesan Bunyi", inputName: "NAMA MURID", inputClass: "KELAS", selectLang: "PILIH BAHASA",
+        errFill: "Sila isi nama dan kelas terlebih dahulu!", pauseTitle: "PERMAINAN DIJEDA", resumeBtn: "SAMBUNG", restartBtn: "MULA SEMULA",
+        mainMenuBtn: "MENU UTAMA", gameOverTitle: "TAMAT PERMAINAN", goMsg: "Kawasan permainan telah penuh!",
+        statusSending: "Menghantar skor...", statusSuccess: "Skor berjaya disimpan ke Leaderboard!", statusFail: "Gagal menghantar skor. Sila cuba lagi.",
+        statusNotConnected: "Leaderboard Belum Disambungkan.", rank: "#", name: "NAMA", class: "KELAS", score: "SKOR", planet: "GABUNGAN"
+      },
+      en: {
+        welcomeMsg: "Welcome, {name} from class {class}!",
+        score: "SCORE", high: "HIGH SCORE", next: "NEXT", merges: "MERGES",
+        startBtn: "START GAME 🚀", playBtn: "PLAY GAME 🎮", howToBtn: "HOW TO PLAY 📖",
+        encycloBtn: "PLANET ENCYCLOPEDIA 🪐", leaderboardBtn: "LEADERBOARD 🏆", changeStudentBtn: "CHANGE STUDENT 👤",
+        musicVol: "Music", sfxVol: "Sound FX", inputName: "STUDENT NAME", inputClass: "CLASS", selectLang: "SELECT LANGUAGE",
+        errFill: "Please enter your name and class!", pauseTitle: "GAME PAUSED", resumeBtn: "RESUME", restartBtn: "RESTART",
+        mainMenuBtn: "MAIN MENU", gameOverTitle: "GAME OVER", goMsg: "The play area is full!",
+        statusSending: "Submitting score...", statusSuccess: "Score saved to Leaderboard!", statusFail: "Failed to submit score. Try again.",
+        statusNotConnected: "Leaderboard Not Connected.", rank: "#", name: "NAME", class: "CLASS", score: "SCORE", planet: "MERGES"
+      }
+    };
+
+    let currentLang = 'ms';
+    let studentName = '';
+    let studentClass = '';
+    let sessionId = '';
+    
+    let gameState = 'SETUP';
+    let currentScore = 0;
+    let highScore = 0;
+    let totalMerges = 0;
+    let gameStartTime = 0;
+    let gameDuration = 0;
+
+    let unlockedPlanets = new Set([0]);
+
+    let canvas, ctx;
+    let nextCanvas, nextCtx;
+    let containerWidth = 380;
+    let containerHeight = 560;
+    let scaleRatio = 1;
+
+    let planetsInPlay = [];
+    let currentPlanetTier = 0;
+    let nextPlanetTier = 0;
+    let dropX = containerWidth / 2;
+    let lastDropTime = 0;
+
+    let comboCount = 0;
+    let lastMergeTime = 0;
+    let floatingTexts = [];
+    let warningTimer = 0;
+
+    let audioCtx = null;
+    let musicGain = null;
+    let sfxGain = null;
+    let musicVol = 0.8;
+    let sfxVol = 0.8;
+    let isMusicMuted = false;
+    let isSfxMuted = false;
+    let musicInterval = null;
+
+    function isModalActive() {
+      return document.querySelector('.modal-overlay.active') !== null;
+    }
+
+    function initAudio() {
+      if (!audioCtx) {
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        audioCtx = new AudioContext();
+
+        musicGain = audioCtx.createGain();
+        sfxGain = audioCtx.createGain();
+
+        musicGain.gain.value = musicVol;
+        sfxGain.gain.value = sfxVol;
+
+        musicGain.connect(audioCtx.destination);
+        sfxGain.connect(audioCtx.destination);
+      }
+      if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+      startBackgroundMusic();
+    }
+
+    function playSfx(type) {
+      if (!audioCtx || isSfxMuted) return;
+
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.connect(gain);
+      gain.connect(sfxGain);
+
+      const now = audioCtx.currentTime;
+
+      if (type === 'drop') {
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(450, now);
+        osc.frequency.exponentialRampToValueAtTime(100, now + 0.14);
+        gain.gain.setValueAtTime(0.6, now);
+        gain.gain.linearRampToValueAtTime(0.01, now + 0.14);
+        osc.start(now);
+        osc.stop(now + 0.14);
+      } else if (type === 'merge') {
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(320, now);
+        osc.frequency.exponentialRampToValueAtTime(700, now + 0.18);
+        gain.gain.setValueAtTime(0.7, now);
+        gain.gain.linearRampToValueAtTime(0.01, now + 0.18);
+        osc.start(now);
+        osc.stop(now + 0.18);
+      } else if (type === 'combo') {
+        osc.type = 'square';
+        osc.frequency.setValueAtTime(523.25, now);
+        osc.frequency.setValueAtTime(659.25, now + 0.07);
+        osc.frequency.setValueAtTime(783.99, now + 0.14);
+        osc.frequency.setValueAtTime(1046.50, now + 0.21);
+        gain.gain.setValueAtTime(0.5, now);
+        gain.gain.linearRampToValueAtTime(0.01, now + 0.3);
+        osc.start(now);
+        osc.stop(now + 0.3);
+      } else if (type === 'click') {
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(850, now);
+        gain.gain.setValueAtTime(0.3, now);
+        gain.gain.linearRampToValueAtTime(0.01, now + 0.05);
+        osc.start(now);
+        osc.stop(now + 0.05);
+      }
+    }
+
+    // SUSUNAN LATAR MUZIK: LAGU 1 -> LAGU 1 -> LAGU 2 -> (ULANG)
+    function startBackgroundMusic() {
+      if (musicInterval) return;
+
+      const lagu1_mel = [261.63, 329.63, 392.00, 523.25, 440.00, 349.23, 392.00, 659.25, 523.25, 440.00, 392.00, 329.63, 349.23, 392.00, 440.00, 493.88];
+      const lagu1_har = [329.63, 392.00, 329.63, 392.00, 277.18, 349.23, 293.66, 349.23, 329.63, 392.00, 329.63, 392.00, 293.66, 349.23, 293.66, 392.00];
+      const lagu1_bass = [130.81, 130.81, 110.00, 110.00, 87.31, 87.31, 98.00, 98.00, 130.81, 130.81, 110.00, 110.00, 87.31, 87.31, 98.00, 98.00];
+
+      const lagu2_mel = [523.25, 587.33, 659.25, 783.99, 659.25, 587.33, 523.25, 440.00, 392.00, 440.00, 523.25, 659.25, 587.33, 493.88, 523.25, 0];
+      const lagu2_har = [329.63, 392.00, 440.00, 523.25, 349.23, 440.00, 329.63, 392.00, 293.66, 349.23, 392.00, 493.88, 329.63, 392.00, 329.63, 0];
+      const lagu2_bass = [130.81, 164.81, 110.00, 130.81, 87.31, 110.00, 98.00, 110.00, 130.81, 130.81, 98.00, 98.00, 130.81, 130.81, 130.81, 130.81];
+
+      const melNotes = [...lagu1_mel, ...lagu1_mel, ...lagu2_mel];
+      const harmonyNotes = [...lagu1_har, ...lagu1_har, ...lagu2_har];
+      const bassNotes = [...lagu1_bass, ...lagu1_bass, ...lagu2_bass];
+
+      let step = 0;
+
+      musicInterval = setInterval(() => {
+        if (!audioCtx || isMusicMuted || gameState === 'PAUSED') return;
+
+        const now = audioCtx.currentTime;
+
+        const freq = melNotes[step % melNotes.length];
+        if (freq > 0) {
+          const osc = audioCtx.createOscillator();
+          const gain = audioCtx.createGain();
+          osc.type = 'sawtooth';
+          osc.frequency.setValueAtTime(freq, now);
+
+          gain.gain.setValueAtTime(0.18, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.22);
+
+          osc.connect(gain);
+          gain.connect(musicGain);
+          osc.start(now);
+          osc.stop(now + 0.22);
+        }
+
+        const hFreq = harmonyNotes[step % harmonyNotes.length];
+        if (hFreq > 0 && step % 2 === 0) {
+          const hOsc = audioCtx.createOscillator();
+          const hGain = audioCtx.createGain();
+          hOsc.type = 'sine';
+          hOsc.frequency.setValueAtTime(hFreq, now);
+
+          hGain.gain.setValueAtTime(0.10, now);
+          hGain.gain.exponentialRampToValueAtTime(0.001, now + 0.18);
+
+          hOsc.connect(hGain);
+          hGain.connect(musicGain);
+          hOsc.start(now);
+          hOsc.stop(now + 0.18);
+        }
+
+        if (step % 2 === 0) {
+          const bOsc = audioCtx.createOscillator();
+          const bGain = audioCtx.createGain();
+          bOsc.type = 'triangle';
+          const bFreqVal = bassNotes[step % bassNotes.length];
+          bOsc.frequency.setValueAtTime(bFreqVal, now);
+
+          bGain.gain.setValueAtTime(0.30, now);
+          bGain.gain.exponentialRampToValueAtTime(0.001, now + 0.25);
+
+          bOsc.connect(bGain);
+          bGain.connect(musicGain);
+          bOsc.start(now);
+          bOsc.stop(now + 0.25);
+        }
+
+        step++;
+      }, 200);
+    }
+
+    function setMusicVolume(val) {
+      musicVol = parseFloat(val);
+      if (musicGain) musicGain.gain.value = musicVol;
+    }
+
+    function setSfxVolume(val) {
+      sfxVol = parseFloat(val);
+      if (sfxGain) sfxGain.gain.value = sfxVol;
+    }
+
+    window.addEventListener('load', () => {
+      canvas = document.getElementById('gameCanvas');
+      ctx = canvas.getContext('2d');
+
+      nextCanvas = document.getElementById('nextCanvas');
+      nextCtx = nextCanvas.getContext('2d');
+
+      initStarfield();
+      resizeCanvas();
+      window.addEventListener('resize', resizeCanvas);
+
+      canvas.addEventListener('mousemove', handlePointerMove);
+      canvas.addEventListener('click', handlePointerDrop);
+      canvas.addEventListener('touchstart', handleTouchStart, { passive: false });
+      canvas.addEventListener('touchmove', handleTouchMove, { passive: false });
+      canvas.addEventListener('touchend', handleTouchDrop, { passive: false });
+
+      const savedHigh = localStorage.getItem('pm_highscore');
+      if (savedHigh) {
+        highScore = parseInt(savedHigh);
+        document.getElementById('hudHighScore').innerText = highScore;
+      }
+
+      requestAnimationFrame(gameLoop);
+    });
+
+    function resizeCanvas() {
+      const hudHeader = document.querySelector('.hud-header');
+      const sidePanel = document.querySelector('.side-panel');
+
+      const hudH = hudHeader ? hudHeader.offsetHeight : 50;
+      const panelH = sidePanel ? sidePanel.offsetHeight : 70;
+
+      const availableH = window.innerHeight - hudH - panelH - 35;
+      const availableW = window.innerWidth - 24;
+
+      const targetRatio = 380 / 540;
+      let w = availableW;
+      let h = w / targetRatio;
+
+      if (h > availableH) {
+        h = availableH;
+        w = h * targetRatio;
+      }
+
+      containerWidth = Math.max(260, Math.min(420, w));
+      containerHeight = Math.max(380, Math.min(620, h));
+
+      canvas.width = containerWidth;
+      canvas.height = containerHeight;
+
+      scaleRatio = containerWidth / 380;
+    }
+
+    function initStarfield() {
+      const bgCanvas = document.getElementById('starfieldCanvas');
+      const bgCtx = bgCanvas.getContext('2d');
+      bgCanvas.width = window.innerWidth;
+      bgCanvas.height = window.innerHeight;
+
+      const stars = [];
+      for (let i = 0; i < 110; i++) {
+        stars.push({
+          x: Math.random() * bgCanvas.width,
+          y: Math.random() * bgCanvas.height,
+          radius: Math.random() * 1.6,
+          alpha: Math.random()
+        });
+      }
+
+      function drawStars() {
+        bgCtx.clearRect(0, 0, bgCanvas.width, bgCanvas.height);
+        bgCtx.fillStyle = '#ffffff';
+        stars.forEach(s => {
+          s.alpha += (Math.random() - 0.5) * 0.02;
+          if (s.alpha < 0.1) s.alpha = 0.1;
+          if (s.alpha > 1) s.alpha = 1;
+          bgCtx.globalAlpha = s.alpha;
+          bgCtx.beginPath();
+          bgCtx.arc(s.x, s.y, s.radius, 0, Math.PI * 2);
+          bgCtx.fill();
+        });
+        requestAnimationFrame(drawStars);
+      }
+      drawStars();
+    }
+
+    function drawPlanetGraphic(context, x, y, radius, tier, angle = 0) {
+      context.save();
+      context.translate(x, y);
+
+      const data = getPlanetData(tier);
+
+      let planetColor = data.color;
+      let isRainbow = !!data.isSecret;
+      let rainbowHue = 0;
+
+      if (isRainbow) {
+        rainbowHue = (Date.now() / 12) % 360;
+        planetColor = `hsl(${rainbowHue}, 95%, 60%)`;
+      }
+
+      // TIER 12: MATAHARI
+      if (tier >= 12) {
+        const sunGlow = context.createRadialGradient(0, 0, radius * 0.8, 0, 0, radius * 1.4);
+        sunGlow.addColorStop(0, 'rgba(251, 191, 36, 0.9)');
+        sunGlow.addColorStop(0.5, 'rgba(249, 115, 22, 0.4)');
+        sunGlow.addColorStop(1, 'rgba(239, 68, 68, 0)');
+        context.beginPath();
+        context.arc(0, 0, radius * 1.4, 0, Math.PI * 2);
+        context.fillStyle = sunGlow;
+        context.fill();
+
+        const coreGrad = context.createRadialGradient(-radius * 0.2, -radius * 0.2, 0, 0, 0, radius);
+        coreGrad.addColorStop(0, '#ffffff');
+        coreGrad.addColorStop(0.3, '#fef08a');
+        coreGrad.addColorStop(0.7, '#f59e0b');
+        coreGrad.addColorStop(1, '#b45309');
+
+        context.beginPath();
+        context.arc(0, 0, radius, 0, Math.PI * 2);
+        context.fillStyle = coreGrad;
+        context.fill();
+        context.restore();
+        return;
+      }
+
+      // TIER 11: PLANET KUCING 🐱
+      if (tier === 11) {
+        context.save();
+        context.rotate(angle);
+        
+        const earColor = `hsl(${(rainbowHue + 40) % 360}, 95%, 55%)`;
+        context.fillStyle = earColor;
+
+        context.beginPath();
+        context.moveTo(-radius * 0.7, -radius * 0.4);
+        context.lineTo(-radius * 0.45, -radius * 1.25);
+        context.lineTo(-radius * 0.1, -radius * 0.75);
+        context.closePath();
+        context.fill();
+
+        context.beginPath();
+        context.moveTo(radius * 0.7, -radius * 0.4);
+        context.lineTo(radius * 0.45, -radius * 1.25);
+        context.lineTo(radius * 0.1, -radius * 0.75);
+        context.closePath();
+        context.fill();
+        
+        context.restore();
+      }
+
+      // GELUNG ZUHAL (TIER 6), URANUS (TIER 5) DAN PLANET X (TIER 10)
+      if (tier === 6) {
+        context.save();
+        context.rotate(angle);
+        context.scale(1, 0.32);
+        context.beginPath();
+        context.arc(0, 0, radius * 1.9, 0, Math.PI * 2);
+        context.strokeStyle = 'rgba(234, 179, 8, 0.75)';
+        context.lineWidth = radius * 0.35;
+        context.stroke();
+        context.restore();
+      } else if (tier === 5) {
+        context.save();
+        context.rotate(angle + Math.PI / 3.5);
+        context.scale(1, 0.22);
+        context.beginPath();
+        context.arc(0, 0, radius * 1.55, 0, Math.PI * 2);
+        context.strokeStyle = 'rgba(165, 243, 252, 0.6)';
+        context.lineWidth = radius * 0.15;
+        context.stroke();
+        context.restore();
+      } else if (tier === 10) {
+        context.save();
+        context.rotate(angle);
+        context.scale(1, 0.28);
+        context.beginPath();
+        context.arc(0, 0, radius * 1.7, 0, Math.PI * 2);
+        context.strokeStyle = `hsl(${(rainbowHue + 120) % 360}, 100%, 70%)`;
+        context.lineWidth = radius * 0.25;
+        context.stroke();
+        context.restore();
+      }
+
+      context.save();
+      context.rotate(angle);
+
+      const grad = context.createRadialGradient(
+        -radius * 0.35, -radius * 0.35, radius * 0.05,
+        0, 0, radius
+      );
+      grad.addColorStop(0, '#ffffff');
+      grad.addColorStop(0.25, planetColor);
+      grad.addColorStop(0.85, isRainbow ? `hsl(${(rainbowHue + 60) % 360}, 80%, 30%)` : adjustColor(planetColor, -80));
+      grad.addColorStop(1, '#050714');
+
+      context.beginPath();
+      context.arc(0, 0, radius, 0, Math.PI * 2);
+      context.fillStyle = grad;
+      context.fill();
+
+      context.clip();
+
+      if (tier === 0 || tier === 1) {
+        context.fillStyle = 'rgba(0, 0, 0, 0.22)';
+        [
+          { cx: -0.3, cy: -0.2, r: 0.22 },
+          { cx: 0.25, cy: 0.3, r: 0.28 },
+          { cx: -0.4, cy: 0.45, r: 0.18 },
+          { cx: 0.1, cy: -0.5, r: 0.15 }
+        ].forEach(c => {
+          context.beginPath();
+          context.arc(c.cx * radius, c.cy * radius, c.r * radius, 0, Math.PI * 2);
+          context.fill();
+        });
+      } else if (tier === 3) {
+        context.fillStyle = '#22c55e';
+        context.beginPath();
+        context.arc(-radius * 0.25, -radius * 0.1, radius * 0.45, 0, Math.PI * 2);
+        context.arc(radius * 0.3, radius * 0.35, radius * 0.38, 0, Math.PI * 2);
+        context.arc(-radius * 0.1, radius * 0.5, radius * 0.25, 0, Math.PI * 2);
+        context.fill();
+      } else if (tier === 7) {
+        context.fillStyle = 'rgba(120, 53, 15, 0.4)';
+        context.fillRect(-radius, -radius * 0.65, radius * 2, radius * 0.22);
+        context.fillRect(-radius, -radius * 0.15, radius * 2, radius * 0.25);
+        context.fillRect(-radius, radius * 0.35, radius * 2, radius * 0.18);
+
+        context.fillStyle = '#dc2626';
+        context.beginPath();
+        context.ellipse(radius * 0.32, radius * 0.22, radius * 0.28, radius * 0.18, 0, 0, Math.PI * 2);
+        context.fill();
+      } else if (tier === 8) { // PLUTO 🧊 AIS BERFROS
+        context.fillStyle = 'rgba(224, 242, 254, 0.55)';
+        context.beginPath();
+        context.arc(-radius * 0.15, -radius * 0.1, radius * 0.55, 0, Math.PI * 2);
+        context.fill();
+
+        context.strokeStyle = '#ffffff';
+        context.lineWidth = Math.max(1.2, radius * 0.06);
+        context.beginPath();
+        context.moveTo(-radius * 0.6, -radius * 0.2);
+        context.lineTo(-radius * 0.1, radius * 0.1);
+        context.lineTo(radius * 0.4, -radius * 0.3);
+        context.moveTo(-radius * 0.2, radius * 0.5);
+        context.lineTo(radius * 0.2, radius * 0.1);
+        context.lineTo(radius * 0.6, radius * 0.4);
+        context.stroke();
+
+        context.fillStyle = '#ffffff';
+        [
+          { cx: -0.35, cy: -0.4, r: 0.08 },
+          { cx: 0.25, cy: -0.2, r: 0.1 },
+          { cx: -0.15, cy: 0.35, r: 0.07 },
+          { cx: 0.4, cy: 0.2, r: 0.09 }
+        ].forEach(pt => {
+          context.beginPath();
+          context.arc(pt.cx * radius, pt.cy * radius, pt.r * radius, 0, Math.PI * 2);
+          context.fill();
+        });
+      } else if (tier === 9) {
+        context.fillStyle = 'rgba(255, 255, 255, 0.9)';
+        context.beginPath();
+        context.arc(-radius * 0.1, -radius * 0.1, radius * 0.15, 0, Math.PI * 2);
+        context.arc(-radius * 0.02, -radius * 0.05, radius * 0.08, 0, Math.PI * 2);
+        context.fill();
+      } else if (tier === 10) {
+        context.fillStyle = `hsl(${(rainbowHue + 180) % 360}, 90%, 75%)`;
+        context.fillRect(-radius, -radius * 0.3, radius * 2, radius * 0.15);
+        context.fillRect(-radius, radius * 0.2, radius * 2, radius * 0.12);
+      } else if (tier === 11) {
+        context.fillStyle = '#ffffff';
+        context.beginPath();
+        context.ellipse(-radius * 0.3, -radius * 0.1, radius * 0.12, radius * 0.18, 0, 0, Math.PI * 2);
+        context.ellipse(radius * 0.3, -radius * 0.1, radius * 0.12, radius * 0.18, 0, 0, Math.PI * 2);
+        context.fill();
+        context.fillStyle = '#000000';
+        context.beginPath();
+        context.ellipse(-radius * 0.3, -radius * 0.1, radius * 0.05, radius * 0.14, 0, 0, Math.PI * 2);
+        context.ellipse(radius * 0.3, -radius * 0.1, radius * 0.05, radius * 0.14, 0, 0, Math.PI * 2);
+        context.fill();
+
+        context.fillStyle = '#f43f5e';
+        context.beginPath();
+        context.arc(0, radius * 0.1, radius * 0.08, 0, Math.PI * 2);
+        context.fill();
+
+        context.strokeStyle = '#ffffff';
+        context.lineWidth = Math.max(1.5, radius * 0.04);
+        context.beginPath();
+        context.moveTo(-radius * 0.2, radius * 0.1); context.lineTo(-radius * 0.7, 0);
+        context.moveTo(-radius * 0.2, radius * 0.18); context.lineTo(-radius * 0.68, radius * 0.25);
+        context.moveTo(radius * 0.2, radius * 0.1); context.lineTo(radius * 0.7, 0);
+        context.moveTo(radius * 0.2, radius * 0.18); context.lineTo(radius * 0.68, radius * 0.25);
+        context.stroke();
+      }
+
+      const atmosphericGlow = context.createRadialGradient(0, 0, radius * 0.85, 0, 0, radius);
+      atmosphericGlow.addColorStop(0, 'rgba(255, 255, 255, 0)');
+      atmosphericGlow.addColorStop(1, isRainbow ? `hsl(${rainbowHue}, 100%, 70%)` : data.isIce ? 'rgba(186, 230, 253, 0.6)' : 'rgba(56, 189, 248, 0.3)');
+      context.fillStyle = atmosphericGlow;
+      context.beginPath();
+      context.arc(0, 0, radius, 0, Math.PI * 2);
+      context.fill();
+
+      context.restore();
+      context.restore();
+    }
+
+    class Planet {
+      constructor(x, y, tier) {
+        this.x = x;
+        this.y = y;
+        this.tier = Math.min(tier, PLANET_DATA.length - 1);
+        this.radius = getPlanetData(this.tier).baseRadius * scaleRatio;
+        this.vx = (Math.random() - 0.5) * 0.3;
+        this.vy = 0;
+        this.angle = 0;
+        this.angularVelocity = 0;
+        this.id = Math.random().toString(36).substr(2, 9);
+        this.merged = false;
+        this.spawnTime = Date.now();
+      }
+
+      update() {
+        const gravity = 0.95 * scaleRatio;
+        const friction = 0.84;
+
+        this.vy += gravity;
+        this.x += this.vx;
+        this.y += this.vy;
+
+        this.vx *= friction;
+        this.vy *= friction;
+
+        this.angularVelocity = (this.vx / this.radius);
+        this.angle += this.angularVelocity;
+
+        if (this.x - this.radius < 0) {
+          this.x = this.radius;
+          this.vx *= -0.2;
+        }
+        if (this.x + this.radius > containerWidth) {
+          this.x = containerWidth - this.radius;
+          this.vx *= -0.2;
+        }
+
+        if (this.y + this.radius > containerHeight) {
+          this.y = containerHeight - this.radius;
+          this.vy *= -0.05;
+          this.vx *= 0.88;
+        }
+      }
+
+      draw() {
+        drawPlanetGraphic(ctx, this.x, this.y, this.radius, this.tier, this.angle);
+      }
+    }
+
+    function updatePhysics() {
+      for (let i = 0; i < planetsInPlay.length; i++) {
+        planetsInPlay[i].update();
+      }
+
+      for (let i = 0; i < planetsInPlay.length; i++) {
+        for (let j = i + 1; j < planetsInPlay.length; j++) {
+          const p1 = planetsInPlay[i];
+          const p2 = planetsInPlay[j];
+
+          if (p1.merged || p2.merged) continue;
+
+          const dx = p2.x - p1.x;
+          const dy = p2.y - p1.y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          const minDist = p1.radius + p2.radius;
+
+          if (dist < minDist) {
+            if (p1.tier === p2.tier) {
+              mergePlanets(p1, p2);
+              return;
+            }
+
+            const overlap = minDist - dist;
+            const nx = dx / (dist || 1);
+            const ny = dy / (dist || 1);
+
+            p1.x -= nx * overlap * 0.5;
+            p1.y -= ny * overlap * 0.5;
+            p2.x += nx * overlap * 0.5;
+            p2.y += ny * overlap * 0.5;
+
+            const kx = p1.vx - p2.vx;
+            const ky = p1.vy - p2.vy;
+            const p = (nx * kx + ny * ky);
+
+            p1.vx -= p * nx * 0.5;
+            p1.vy -= p * ny * 0.5;
+            p2.vx += p * nx * 0.5;
+            p2.vy += p * ny * 0.5;
+
+            p1.vx *= 0.3;
+            p2.vx *= 0.3;
+            p1.vy *= 0.8;
+            p2.vy *= 0.8;
+          }
+        }
+      }
+
+      planetsInPlay = planetsInPlay.filter(p => !p.merged);
+
+      let isOverflowing = false;
+      const warningY = 100 * scaleRatio;
+      const now = Date.now();
+
+      for (let p of planetsInPlay) {
+        if (p.spawnTime && (now - p.spawnTime < 400)) continue;
+
+        if (p.y - p.radius < warningY && p.vy < 1.5) {
+          isOverflowing = true;
+          break;
+        }
+      }
+
+      if (isOverflowing) {
+        warningTimer += 1 / 60;
+        if (warningTimer >= 5.0) {
+          triggerGameOver();
+        }
+      } else {
+        warningTimer = Math.max(0, warningTimer - 3 / 60);
+      }
+    }
+
+    function mergePlanets(p1, p2) {
+      p1.merged = true;
+      p2.merged = true;
+
+      const midX = (p1.x + p2.x) / 2;
+      const midY = (p1.y + p2.y) / 2;
+
+      if (p1.tier >= 12) {
+        totalMerges++;
+        document.getElementById('hudMerges').innerText = totalMerges;
+        addScore(20000, midX, midY);
+        playSfx('combo');
+        createFloatingText("SUPERNOVA! +20000 ☀️", midX, midY - 40);
+
+        const sunPlanet = new Planet(midX, midY, 12);
+        planetsInPlay.push(sunPlanet);
+        return;
+      }
+
+      const newTier = p1.tier + 1;
+      const isFirstUnlock = !unlockedPlanets.has(newTier);
+      unlockedPlanets.add(newTier);
+
+      const newRadius = getPlanetData(newTier).baseRadius * scaleRatio;
+      const clampedX = Math.max(newRadius, Math.min(containerWidth - newRadius, midX));
+      const clampedY = Math.max(newRadius + 10, Math.min(containerHeight - newRadius, midY));
+
+      const newPlanet = new Planet(clampedX, clampedY, newTier);
+      newPlanet.spawnTime = Date.now();
+      planetsInPlay.push(newPlanet);
+
+      totalMerges++;
+      document.getElementById('hudMerges').innerText = totalMerges;
+
+      const now = Date.now();
+      if (now - lastMergeTime < 2200) {
+        comboCount++;
+      } else {
+        comboCount = 1;
+      }
+      lastMergeTime = now;
+
+      const baseScore = getPlanetData(newTier).score;
+      const finalScore = baseScore * comboCount;
+      addScore(finalScore, midX, midY);
+
+      if (comboCount > 1) {
+        playSfx('combo');
+        createFloatingText(`KOMBO x${comboCount}!`, midX, midY - 20);
+      } else {
+        playSfx('merge');
+      }
+
+      if (isFirstUnlock) {
+        showUnlockModal(newTier);
+      }
+
+      if (newTier === 12 && !isFirstUnlock) {
+        playSfx('combo');
+        openModal('modalWin');
+        createFloatingText("MATAHARI TERDIRI! ANDA MENANG! ☀️", midX, midY - 40);
+      }
+    }
+
+    function showUnlockModal(tier) {
+      playSfx('combo');
+      const data = getPlanetData(tier);
+      const name = currentLang === 'ms' ? data.nameMs : data.nameEn;
+      const fact = currentLang === 'ms' ? data.factMs : data.factEn;
+
+      document.getElementById('unlockPlanetTitle').innerText = name;
+      document.getElementById('unlockPlanetKm').innerText = data.realKm;
+      document.getElementById('unlockPlanetFact').innerText = fact;
+
+      const uCanvas = document.getElementById('unlockCanvas');
+      const uCtx = uCanvas.getContext('2d');
+      uCtx.clearRect(0, 0, uCanvas.width, uCanvas.height);
+      
+      const drawR = Math.min(44, data.baseRadius * 0.6);
+      drawPlanetGraphic(uCtx, 55, 55, drawR, tier, 0);
+
+      openModal('modalUnlock');
+      gameState = 'PAUSED';
+    }
+
+    function resumeFromUnlock() {
+      playSfx('click');
+      closeModal('modalUnlock');
+      gameState = 'PLAYING';
+    }
+
+    function addScore(pts, x, y) {
+      currentScore += pts;
+      document.getElementById('hudScore').innerText = currentScore;
+
+      if (currentScore > highScore) {
+        highScore = currentScore;
+        document.getElementById('hudHighScore').innerText = highScore;
+        localStorage.setItem('pm_highscore', highScore);
+      }
+
+      createFloatingText(`+${pts}`, x, y);
+    }
+
+    function createFloatingText(txt, x, y) {
+      floatingTexts.push({
+        text: txt,
+        x: x,
+        y: y,
+        alpha: 1.0,
+        dy: -1.6
+      });
+    }
+
+    function getXFromEvent(e) {
+      if (!e) return dropX;
+      const rect = canvas.getBoundingClientRect();
+      let clientX = dropX;
+
+      if (e.changedTouches && e.changedTouches.length > 0) {
+        clientX = e.changedTouches[0].clientX;
+      } else if (e.touches && e.touches.length > 0) {
+        clientX = e.touches[0].clientX;
+      } else if (e.clientX !== undefined) {
+        clientX = e.clientX;
+      }
+
+      return clientX - rect.left;
+    }
+
+    function handlePointerMove(e) {
+      if (gameState !== 'PLAYING' || isModalActive()) return;
+      dropX = getXFromEvent(e);
+      clampDropX();
+    }
+
+    function handleTouchStart(e) {
+      if (gameState !== 'PLAYING' || isModalActive()) return;
+      if (e.cancelable) e.preventDefault();
+      dropX = getXFromEvent(e);
+      clampDropX();
+    }
+
+    function handleTouchMove(e) {
+      if (gameState !== 'PLAYING' || isModalActive()) return;
+      if (e.cancelable) e.preventDefault();
+      dropX = getXFromEvent(e);
+      clampDropX();
+    }
+
+    function handlePointerDrop(e) {
+      if (e && e.cancelable) e.preventDefault();
+      if (gameState !== 'PLAYING' || isModalActive()) return;
+
+      const now = Date.now();
+      if (now - lastDropTime < 300) return;
+
+      if (e) {
+        dropX = getXFromEvent(e);
+        clampDropX();
+      }
+
+      const spawnY = 30 * scaleRatio;
+      const p = new Planet(dropX, spawnY, currentPlanetTier);
+      planetsInPlay.push(p);
+
+      playSfx('drop');
+      lastDropTime = now;
+
+      currentPlanetTier = nextPlanetTier;
+      nextPlanetTier = getRandomUnlockedSpawnTier();
+      drawNextPlanetPreview();
+    }
+
+    function handleTouchDrop(e) {
+      if (gameState !== 'PLAYING' || isModalActive()) return;
+      if (e.cancelable) e.preventDefault();
+      handlePointerDrop(e);
+    }
+
+    function clampDropX() {
+      const radius = getPlanetData(currentPlanetTier).baseRadius * scaleRatio;
+      if (dropX < radius) dropX = radius;
+      if (dropX > containerWidth - radius) dropX = containerWidth - radius;
+    }
+
+    function getRandomUnlockedSpawnTier() {
+      const baseWeights = {
+        0: 42,
+        1: 26,
+        2: 15,
+        3: 9,
+        4: 4.5,
+        5: 2.2,
+        6: 0.9,
+        7: 0.4,
+        8: 0.2,
+        9: 0.1,
+        10: 0.05
+      };
+
+      const validTiers = Array.from(unlockedPlanets).filter(t => t in baseWeights);
+      if (validTiers.length === 0) return 0;
+
+      let totalWeight = 0;
+      validTiers.forEach(t => { totalWeight += baseWeights[t]; });
+
+      let rand = Math.random() * totalWeight;
+      for (let t of validTiers) {
+        if (rand < baseWeights[t]) return t;
+        rand -= baseWeights[t];
+      }
+      return validTiers[0];
+    }
+
+    function drawNextPlanetPreview() {
+      nextCtx.clearRect(0, 0, nextCanvas.width, nextCanvas.height);
+      const radius = getPlanetData(nextPlanetTier).baseRadius * 0.42;
+      drawPlanetGraphic(nextCtx, 25, 25, radius, nextPlanetTier, 0);
+
+      const pName = currentLang === 'ms' ? getPlanetData(nextPlanetTier).nameMs : getPlanetData(nextPlanetTier).nameEn;
+      document.getElementById('nextPlanetName').innerText = pName;
+    }
+
+    function gameLoop() {
+      try {
+        if (gameState === 'PLAYING' && !isModalActive()) {
+          ctx.clearRect(0, 0, containerWidth, containerHeight);
+
+          const warningY = 100 * scaleRatio;
+          ctx.save();
+          ctx.setLineDash([6, 6]);
+          ctx.strokeStyle = warningTimer > 0 ? 'rgba(239, 68, 68, 0.95)' : 'rgba(239, 68, 68, 0.4)';
+          ctx.lineWidth = warningTimer > 0 ? 3 : 2;
+          ctx.beginPath();
+          ctx.moveTo(0, warningY);
+          ctx.lineTo(containerWidth, warningY);
+          ctx.stroke();
+
+          if (warningTimer > 0) {
+            const countdownLeft = Math.max(0, 5.0 - warningTimer).toFixed(1);
+            ctx.fillStyle = '#ef4444';
+            ctx.font = 'bold 13px Fredoka, sans-serif';
+            ctx.textAlign = 'right';
+            ctx.fillText(`AMARAN! GAME OVER DALAM ${countdownLeft}s`, containerWidth - 10, warningY - 6);
+          }
+          ctx.restore();
+
+          updatePhysics();
+          for (let p of planetsInPlay) {
+            p.draw();
+          }
+
+          const r = getPlanetData(currentPlanetTier).baseRadius * scaleRatio;
+          ctx.save();
+          ctx.globalAlpha = 0.45;
+          ctx.strokeStyle = 'rgba(56, 189, 248, 0.6)';
+          ctx.setLineDash([4, 4]);
+          ctx.beginPath();
+          ctx.moveTo(dropX, 30 * scaleRatio);
+          ctx.lineTo(dropX, containerHeight);
+          ctx.stroke();
+          ctx.restore();
+
+          drawPlanetGraphic(ctx, dropX, 30 * scaleRatio, r, currentPlanetTier, 0);
+
+          for (let i = floatingTexts.length - 1; i >= 0; i--) {
+            const ft = floatingTexts[i];
+            ft.y += ft.dy;
+            ft.alpha -= 0.018;
+
+            ctx.save();
+            ctx.globalAlpha = Math.max(0, ft.alpha);
+            ctx.font = 'bold 16px Fredoka, sans-serif';
+            ctx.fillStyle = '#facc15';
+            ctx.textAlign = 'center';
+            ctx.fillText(ft.text, ft.x, ft.y);
+            ctx.restore();
+
+            if (ft.alpha <= 0) floatingTexts.splice(i, 1);
+          }
+        }
+      } catch (err) {
+        console.error("Game Loop Safety Catch:", err);
+      }
+
+      requestAnimationFrame(gameLoop);
+    }
+
+    function setLanguage(lang) {
+      currentLang = lang;
+      document.getElementById('btnLangMs').classList.toggle('active', lang === 'ms');
+      document.getElementById('btnLangEn').classList.toggle('active', lang === 'en');
+      updateLanguageUI();
+    }
+
+    function updateLanguageUI() {
+      const t = TRANSLATIONS[currentLang];
+
+      document.getElementById('lblScore').innerText = t.score;
+      document.getElementById('lblHigh').innerText = t.high;
+      document.getElementById('lblNext').innerText = t.next;
+      document.getElementById('lblMerges').innerText = t.merges;
+      document.getElementById('btnStartSetup').innerText = t.startBtn;
+      document.getElementById('btnPlay').innerText = t.playBtn;
+      document.getElementById('btnHowToPlay').innerText = t.howToBtn;
+      document.getElementById('btnEncyclopedia').innerText = t.encycloBtn;
+      document.getElementById('btnLeaderboard').innerText = t.leaderboardBtn;
+      document.getElementById('btnChangeStudent').innerText = t.changeStudentBtn;
+      document.getElementById('lblMusicVol').innerText = t.musicVol;
+      document.getElementById('lblSfxVol').innerText = t.sfxVol;
+      document.getElementById('lblInputName').innerText = t.inputName;
+      document.getElementById('lblInputClass').innerText = t.inputClass;
+      document.getElementById('lblSelectLang').innerText = t.selectLang;
+
+      document.getElementById('titlePause').innerText = t.pauseTitle;
+      document.getElementById('btnResume').innerText = t.resumeBtn;
+      document.getElementById('btnRestartPause').innerText = t.restartBtn;
+      document.getElementById('btnMenuPause').innerText = t.mainMenuBtn;
+
+      document.getElementById('titleGameOver').innerText = t.gameOverTitle;
+      document.getElementById('goMsg').innerText = t.goMsg;
+
+      document.getElementById('thName').innerText = t.name;
+      document.getElementById('thClass').innerText = t.class;
+      document.getElementById('thScore').innerText = t.score;
+      document.getElementById('thPlanet').innerText = t.planet;
+
+      if (studentName) {
+        document.getElementById('menuWelcomeMsg').innerText = t.welcomeMsg
+          .replace('{name}', studentName)
+          .replace('{class}', studentClass);
+      }
+
+      drawNextPlanetPreview();
+    }
+
+    function submitStudentSetup() {
+      initAudio();
+      playSfx('click');
+
+      const nameInput = document.getElementById('inputStudentName').value.trim();
+      const classInput = document.getElementById('inputStudentClass').value.trim();
+      const errEl = document.getElementById('setupError');
+
+      if (!nameInput || !classInput) {
+        errEl.innerText = TRANSLATIONS[currentLang].errFill;
+        errEl.style.display = 'block';
+        return;
+      }
+
+      errEl.style.display = 'none';
+      studentName = nameInput;
+      studentClass = classInput;
+
+      document.getElementById('hudName').innerText = studentName;
+      document.getElementById('hudClass').innerText = studentClass;
+
+      closeModal('modalSetup');
+      openModal('modalMenu');
+      gameState = 'MENU';
+      updateLanguageUI();
+    }
+
+    function changeStudentProfile() {
+      playSfx('click');
+      closeModal('modalMenu');
+      openModal('modalSetup');
+      gameState = 'SETUP';
+    }
+
+    function openModal(id) {
+      document.getElementById(id).classList.add('active');
+    }
+
+    function closeModal(id) {
+      document.getElementById(id).classList.remove('active');
+    }
+
+    function startGameSession() {
+      initAudio();
+      playSfx('click');
+      closeModal('modalMenu');
+      closeModal('modalGameOver');
+      closeModal('modalWin');
+      closeModal('modalUnlock');
+
+      currentScore = 0;
+      totalMerges = 0;
+      planetsInPlay = [];
+      warningTimer = 0;
+      unlockedPlanets = new Set([0]);
+      gameStartTime = Date.now();
+      sessionId = 'S_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5);
+
+      document.getElementById('hudScore').innerText = '0';
+      document.getElementById('hudMerges').innerText = '0';
+
+      currentPlanetTier = 0;
+      nextPlanetTier = getRandomUnlockedSpawnTier();
+      drawNextPlanetPreview();
+
+      gameState = 'PLAYING';
+      resizeCanvas();
+    }
+
+    function triggerGameOver() {
+      gameState = 'GAMEOVER';
+      gameDuration = Math.round((Date.now() - gameStartTime) / 1000);
+
+      playSfx('combo');
+
+      const mins = Math.floor(gameDuration / 60);
+      const secs = gameDuration % 60;
+      const durationText = mins > 0 ? `${mins}m ${secs}s` : `${secs}s`;
+
+      document.getElementById('goScoreText').innerText = `${TRANSLATIONS[currentLang].score}: ${currentScore}`;
+      document.getElementById('goDetailsText').innerText = `${TRANSLATIONS[currentLang].merges}: ${totalMerges} | Masa: ${durationText}`;
+
+      openModal('modalGameOver');
+      submitScoreToBackend();
+    }
+
+    document.getElementById('btnPause').addEventListener('click', () => {
+      if (gameState === 'PLAYING') {
+        gameState = 'PAUSED';
+        openModal('modalPause');
+      }
+    });
+
+    function resumeGame() {
+      playSfx('click');
+      closeModal('modalPause');
+      gameState = 'PLAYING';
+    }
+
+    function confirmRestart() {
+      playSfx('click');
+      closeModal('modalPause');
+      startGameSession();
+    }
+
+    function returnToMenu() {
+      playSfx('click');
+      closeModal('modalPause');
+      closeModal('modalGameOver');
+      closeModal('modalWin');
+      closeModal('modalUnlock');
+      gameState = 'MENU';
+      openModal('modalMenu');
+    }
+
+    document.getElementById('btnSound').addEventListener('click', (e) => {
+      isSfxMuted = !isSfxMuted;
+      e.target.classList.toggle('active-off', isSfxMuted);
+    });
+
+    document.getElementById('btnMusic').addEventListener('click', (e) => {
+      isMusicMuted = !isMusicMuted;
+      e.target.classList.toggle('active-off', isMusicMuted);
+    });
+
+    function openEncyclopedia() {
+      playSfx('click');
+      const grid = document.getElementById('encycloGrid');
+      grid.innerHTML = '';
+
+      PLANET_DATA.forEach((data, index) => {
+        const isUnlocked = unlockedPlanets.has(index);
+        const card = document.createElement('div');
+        card.className = `encyclo-card ${isUnlocked ? '' : 'locked'}`;
+
+        const name = currentLang === 'ms' ? data.nameMs : data.nameEn;
+        const fact = currentLang === 'ms' ? data.factMs : data.factEn;
+
+        card.innerHTML = `
+          <div class="encyclo-img" id="encyCanvasContainer_${index}"></div>
+          <div class="encyclo-name">${isUnlocked ? name : '???'}</div>
+          <div style="font-size:0.68rem; color:#facc15; margin-top:2px;">${isUnlocked ? data.realKm : ''}</div>
+          <div class="encyclo-fact">${isUnlocked ? fact : 'Belum dibuka / Locked'}</div>
+        `;
+
+        grid.appendChild(card);
+
+        setTimeout(() => {
+          const c = document.createElement('canvas');
+          c.width = 50;
+          c.height = 50;
+          const cx = c.getContext('2d');
+          drawPlanetGraphic(cx, 25, 25, 16, index, 0);
+          const container = document.getElementById(`encyCanvasContainer_${index}`);
+          if (container) container.appendChild(c);
+        }, 50);
+      });
+
+      openModal('modalEncyclo');
+    }
+
+    async function submitScoreToBackend() {
+      const statusEl = document.getElementById('goStatusText');
+      const retryBtn = document.getElementById('btnRetrySubmit');
+      const t = TRANSLATIONS[currentLang];
+
+      if (!GOOGLE_SCRIPT_URL || GOOGLE_SCRIPT_URL.includes("PASTE_YOUR_DEPLOYED")) {
+        statusEl.innerText = t.statusNotConnected;
+        statusEl.style.color = "#f97316";
+        retryBtn.style.display = "none";
+        return;
+      }
+
+      statusEl.innerText = t.statusSending;
+      statusEl.style.color = "#38bdf8";
+      retryBtn.style.display = "none";
+
+      const payload = {
+        action: "submitScore",
+        sessionId: sessionId,
+        studentName: studentName,
+        studentClass: studentClass,
+        language: currentLang,
+        score: currentScore,
+        planetsMerged: totalMerges,
+        durationSeconds: gameDuration,
+        gameVersion: "2.5.0"
+      };
+
+      try {
+        const response = await fetch(GOOGLE_SCRIPT_URL, {
+          method: "POST",
+          mode: "cors",
+          headers: { "Content-Type": "text/plain;charset=utf-8" },
+          body: JSON.stringify(payload)
+        });
+
+        const data = await response.json();
+        if (data && data.status === "success") {
+          statusEl.innerText = t.statusSuccess;
+          statusEl.style.color = "#4ade80";
+        } else {
+          throw new Error("Server response error");
+        }
+      } catch (err) {
+        console.error(err);
+        statusEl.innerText = t.statusFail;
+        statusEl.style.color = "#f87171";
+        retryBtn.style.display = "block";
+      }
+    }
+
+    async function openLeaderboard() {
+      playSfx('click');
+      openModal('modalLeaderboard');
+      loadLeaderboardData();
+    }
+
+    async function loadLeaderboardData() {
+      const tbody = document.getElementById('leaderboardBody');
+      const statusEl = document.getElementById('leaderboardStatus');
+      const classFilter = document.getElementById('filterClass').value;
+
+      tbody.innerHTML = '';
+
+      if (!GOOGLE_SCRIPT_URL || GOOGLE_SCRIPT_URL.includes("PASTE_YOUR_DEPLOYED")) {
+        statusEl.innerText = TRANSLATIONS[currentLang].statusNotConnected;
+        return;
+      }
+
+      statusEl.innerText = "Memuatkan data...";
+
+      try {
+        const url = `${GOOGLE_SCRIPT_URL}?action=getLeaderboard&classFilter=${encodeURIComponent(classFilter)}`;
+        const res = await fetch(url);
+        const data = await res.json();
+
+        if (data && data.status === "success") {
+          statusEl.innerText = "";
+          const records = data.data;
+
+          if (records.length === 0) {
+            statusEl.innerText = "Tiada rekod lagi.";
+            return;
+          }
+
+          records.forEach((r, idx) => {
+            const tr = document.createElement('tr');
+            let rankClass = idx === 0 ? 'rank-1' : idx === 1 ? 'rank-2' : idx === 2 ? 'rank-3' : '';
+            tr.innerHTML = `
+              <td class="${rankClass}">${idx + 1}</td>
+              <td>${escapeHtml(r.StudentName)}</td>
+              <td>${escapeHtml(r.Class)}</td>
+              <td style="font-weight:700; color:#facc15;">${r.Score}</td>
+              <td>${r.PlanetsMerged || 0}</td>
+            `;
+            tbody.appendChild(tr);
+          });
+        }
+      } catch (err) {
+        console.error(err);
+        statusEl.innerText = "Gagal memuatkan leaderboard.";
+      }
+    }
+
+    function escapeHtml(str) {
+      return String(str || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+  </script>
+</body>
+</html>
